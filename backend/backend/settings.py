@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "users",
     "products",
+    "meals",
 ]
 
 AUTH_USER_MODEL = 'users.MyUser'

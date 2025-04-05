@@ -1,7 +1,7 @@
 from django.db import models
 
 class Product(models.Model):
-    name = models.CharField(max_length=100, null=False, default="default_meal_name", unique=True)
+    name = models.CharField(max_length=100, null=False, default="default_product_name", unique=True)
     complex_carbs = models.FloatField(default=0)
     simple_carbs = models.FloatField(default=0)
     fiber = models.FloatField(default=0)
