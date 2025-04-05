@@ -3,6 +3,13 @@ from django.contrib.auth import get_user_model
 
 MyUser = get_user_model()  # This will fetch 'users.MyUser'
 
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyUser
+        fields = ['id', 'username', 'email', 'age', 'dailyIntake']  # or any other fields you want to expose
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
