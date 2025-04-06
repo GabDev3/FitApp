@@ -19,7 +19,7 @@ class ProductGetSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'carbohydrates', 'complex_carbs', 'simple_carbs', 'fiber',
-            'fats', 'saturated_fat', 'unsaturated_fat', 'protein'
+            'fats', 'saturated_fat', 'unsaturated_fat', 'protein', 'kcal'
         ]
         read_only_fields = fields  # Make all fields read-only
 

@@ -25,3 +25,9 @@ class MealCreateSerializer(serializers.ModelSerializer):
         for mp_data in meal_products_data:
             MealProduct.objects.create(meal=meal, **mp_data)
         return meal
+
+class MealGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meal
+        fields = ['id', 'name', 'kcals']
+        read_only_fields = fields  # Make all fields read-only
