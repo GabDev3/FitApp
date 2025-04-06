@@ -39,3 +39,9 @@ class MealRemoveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meal
         fields = ['id', 'name', 'kcals']
+
+
+class MealEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meal
+        fields = ['id', 'name', 'kcals']
