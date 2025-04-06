@@ -36,6 +36,7 @@ class ProductRemoveView(generics.DestroyAPIView):
         # Return the serialized data of the deleted product
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class ProductEditView(generics.RetrieveUpdateAPIView):
     queryset = Product.objects.all()
     permission_classes = [permissions.AllowAny]

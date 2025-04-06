@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Meal, MealProduct
 from products.models import Product
 
+
 class MealCreateSerializer(serializers.ModelSerializer):
     class MealProductCreateSerializer(serializers.ModelSerializer):
         product_id = serializers.PrimaryKeyRelatedField(
@@ -26,8 +27,15 @@ class MealCreateSerializer(serializers.ModelSerializer):
             MealProduct.objects.create(meal=meal, **mp_data)
         return meal
 
+
 class MealGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meal
         fields = ['id', 'name', 'kcals']
         read_only_fields = fields  # Make all fields read-only
+
+
+class MealRemoveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meal
+        fields = ['id', 'name', 'kcals']
