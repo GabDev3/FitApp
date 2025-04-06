@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from .serializers import (ProductCreateSerializer, ProductGetSerializer,
                           ProductRemoveSerializer, ProductEditSerializer)
 from rest_framework import status, permissions, generics
