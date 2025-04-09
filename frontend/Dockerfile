@@ -1,18 +1,23 @@
-# Use Node.js image
+# Use official Node image
 FROM node:18
 
-# Set working directory
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
+# Copy only package.json and lock file first (for caching deps)
+COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy the rest of your app
 COPY . .
 
-# Expose the port React runs on
-EXPOSE 3000
+# Set host to 0.0.0.0 so it works inside Docker
+ENV HOST=0.0.0.0
 
-# Start the React development server
-CMD ["npm", "start"]
+# Expose Vite's default port
+EXPOSE 5173
+
+# Run Vite dev server
+CMD ["npm", "run", "dev"]
