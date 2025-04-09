@@ -1,5 +1,5 @@
 # Use official Node image
-FROM node:18
+FROM node:20
 
 # Set working directory inside the container
 WORKDIR /app
@@ -20,4 +20,4 @@ ENV HOST=0.0.0.0
 EXPOSE 5173
 
 # Run Vite dev server
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npm install && npm run dev"]
