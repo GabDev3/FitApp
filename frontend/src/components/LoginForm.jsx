@@ -9,7 +9,7 @@ function LoginForm({route, method}){
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const name = method === "login" ? "Login" : "Register";
+    const name = "Login";
 
     const handleSubmit = async (e) => {
         setLoading(true);
@@ -21,10 +21,7 @@ function LoginForm({route, method}){
 //                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
 //                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 navigate("/")
-            } else {
-                navigate("/login")
             }
-
         } catch (error){
             alert(error)
         } finally {

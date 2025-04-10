@@ -6,25 +6,24 @@ import "../styles/Form.css"
 function RegisterForm({route, method}){
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [intake, setIntake] = useState("");
+    const [age, setAge] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const name = method === "login" ? "Login" : "Register";
+    const name = "Register";
 
     const handleSubmit = async (e) => {
         setLoading(true);
         e.preventDefault();
 
         try {
-            const res = await api.post(route, { username, password })
-            if (method === "login") {
-//                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
-//                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-                navigate("/")
-            } else {
+            const res = await api.post(route, { username, email, password, age,
+            dailyIntake: parseFloat(intake), });
+            if (method === "register") {
                 navigate("/login")
             }
-
         } catch (error){
             alert(error)
         } finally {
@@ -41,6 +40,30 @@ function RegisterForm({route, method}){
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
         />
+        <input
+            className="form-input"
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+        />
+
+        <input
+            className="form-input"
+            type="text"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            placeholder="Age"
+        />
+
+        <input
+            className="form-input"
+            type="text"
+            value={intake}
+            onChange={(e) => setIntake(e.target.value)}
+            placeholder="Daily Calories Intake"
+        />
+
         <input
             className="form-input"
             type="password"

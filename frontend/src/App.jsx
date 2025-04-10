@@ -4,6 +4,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
+import ProductInfo from "./pages/ProductInfo"
 
 function Logout() {
     localStorage.clear()
@@ -24,6 +25,7 @@ function App() {
             <Route path = "/login" element={<Login />} />
             <Route path = "/logout" element={<Logout />} />
             <Route path = "/register" element={<RegisterAndLogout />} />
+            <Route path = "/product/info/:id" element={<ProductInfo />} />
             <Route path = "/" element={<Home />} />
             <Route path = "*" element={<NotFound />} />
 
