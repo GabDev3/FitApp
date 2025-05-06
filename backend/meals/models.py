@@ -1,5 +1,5 @@
 from django.db import models
-from products.models import Product
+# from products.models import Product
 
 # Create your models here.
 
@@ -18,7 +18,7 @@ class Meal(models.Model):
 
 class MealProduct(models.Model):
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     quantity = models.FloatField(default=1)
 
     def __str__(self):

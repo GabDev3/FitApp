@@ -6,9 +6,17 @@ from .models import Product
 
 class CreateProductView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer
-    queryset = Product.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Product.objects.filter(author=user)
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save(author=self.request.user)
+        else:
+            print(serializer.errors)
 
 class GetProductView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
@@ -19,7 +27,7 @@ class GetProductView(generics.RetrieveAPIView):
 
 class ProductRemoveView(generics.DestroyAPIView):
     queryset = Product.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductRemoveSerializer
     lookup_field = 'id'
 

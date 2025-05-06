@@ -1,4 +1,5 @@
 from django.db import models
+# from users.models import MyUser
 
 class Product(models.Model):
     name = models.CharField(max_length=100, null=False, default="default_product_name", unique=True)
@@ -9,6 +10,7 @@ class Product(models.Model):
     unsaturated_fat = models.FloatField(default=0)
     protein = models.FloatField(default=0)
     kcal = models.FloatField(blank=True, null=True)
+    author = models.ForeignKey('users.MyUser', on_delete=models.CASCADE, default=1, related_name="products_author")
 
     @property
     def carbohydrates(self):

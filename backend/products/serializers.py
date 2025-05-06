@@ -7,11 +7,12 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'complex_carbs', 'simple_carbs', 'fiber',
-            'saturated_fat', 'unsaturated_fat', 'protein'
+            'saturated_fat', 'unsaturated_fat', 'protein', 'author'
         ]
+        extra_kwargs = {"author": {"read_only": True}}
 
-    def create(self, validated_data):
-        return Product.objects.create(**validated_data)  # kcal is auto-calculated in model
+    # def create(self, validated_data):
+    #     return Product.objects.create(**validated_data)  # kcal is auto-calculated in model
 
 
 class ProductGetSerializer(serializers.ModelSerializer):

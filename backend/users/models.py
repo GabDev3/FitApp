@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from meals.models import Meal
+# from meals.models import Meal
 
 
 class MyUser(AbstractUser):
@@ -9,6 +9,6 @@ class MyUser(AbstractUser):
 
 
 class UserMeal(models.Model):
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name="user_meal")
+    meal = models.ForeignKey('meals.Meal', on_delete=models.CASCADE, related_name="user_meal")
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="user_meal")
     consumed_at = models.DateTimeField(null=False, blank=True, auto_now=True)
