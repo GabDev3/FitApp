@@ -2,6 +2,8 @@ import { useState } from "react"
 import api from "../api"
 import { useNavigate } from "react-router-dom"
 import "../styles/Form.css"
+import { REFRESH_TOKEN, ACCESS_TOKEN} from "../constants";
+
 
 function LoginForm({route, method}){
     const [username, setUsername] = useState("");
@@ -18,8 +20,8 @@ function LoginForm({route, method}){
         try {
             const res = await api.post(route, { username, password })
             if (method === "login") {
-//                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
-//                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+                localStorage.setItem(ACCESS_TOKEN, res.data.access);
+                localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 navigate("/")
             }
         } catch (error){
