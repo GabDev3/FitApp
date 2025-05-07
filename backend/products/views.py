@@ -4,7 +4,7 @@ from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from .models import Product
 
-class CreateProductView(generics.CreateAPIView):
+class CreateProductView(generics.ListCreateAPIView):
     serializer_class = ProductCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
