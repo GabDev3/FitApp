@@ -1,0 +1,77 @@
+/* Global styles for body - define the background and basic layout */
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to right, #f8b500, #fceabb);
+  min-height: 100vh;
+  overflow: hidden; /* Prevent body from scrolling */
+}
+
+/* Container holding the info card */
+.info-container {
+  display: center;
+  justify-content: center;  /* Horizontally centers the card */
+  align-items: flex-start;   /* Align to the top of the viewport */
+  min-height: 100vh;         /* Full viewport height */
+  width: 320px;
+  padding-top: 3rem;         /* Extra space at the top for aesthetics */
+  padding-bottom: 3rem;      /* Prevent unwanted scroll if content fits */
+  overflow: auto;            /* Allow scrolling if content overflows */
+}
+
+/* Info card styling */
+.info-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 2rem 3rem;
+  width: 100%;
+  max-width: 600px;          /* Max width for the card */
+  animation: fadeIn 0.4s ease-in-out;
+  box-sizing: border-box;    /* Ensures padding doesn't affect the width */
+}
+
+/* Title styling */
+.info-title {
+  font-size: 2rem;
+  text-align: center;
+  color: #f8b500;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f8b50020;
+  padding-bottom: 0.5rem;
+}
+
+/* Layout for the info fields */
+.info-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Individual field styling */
+.info-field {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+  color: #333;
+}
+
+/* Label styling */
+.info-label {
+  font-weight: 600;
+  color: #f8b500;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

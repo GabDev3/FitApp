@@ -7,11 +7,9 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'complex_carbs', 'simple_carbs', 'fiber',
-            'saturated_fat', 'unsaturated_fat', 'protein'
+            'saturated_fat', 'unsaturated_fat', 'protein', 'author_product'
         ]
-
-    def create(self, validated_data):
-        return Product.objects.create(**validated_data)  # kcal is auto-calculated in model
+        extra_kwargs = {"author_product": {"read_only": True}}
 
 
 class ProductGetSerializer(serializers.ModelSerializer):
@@ -21,7 +19,7 @@ class ProductGetSerializer(serializers.ModelSerializer):
             'id', 'name', 'carbohydrates', 'complex_carbs', 'simple_carbs', 'fiber',
             'fats', 'saturated_fat', 'unsaturated_fat', 'protein', 'kcal'
         ]
-        read_only_fields = fields  # Make all fields read-only
+        read_only_fields = fields
 
 
 class ProductRemoveSerializer(serializers.ModelSerializer):

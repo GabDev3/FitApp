@@ -22,5 +22,5 @@ RUN python manage.py collectstatic --noinput
 # Expose the port Django runs on
 EXPOSE 8000
 
-# Run migrations and start the server
-CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8000 backend.wsgi:application"]
+# Run migrations manually in order to avoid circular migration issues
+CMD ["sh", "-c", "python manage.py makemigrations --noinput && python manage.py migrate && gunicorn --bind 0.0.0.0:8000 backend.wsgi:application"]
