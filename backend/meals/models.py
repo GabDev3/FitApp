@@ -6,6 +6,7 @@ from django.db import models
 
 class Meal(models.Model):
     name = models.CharField(max_length=100, null=False, default="default_meal_name", unique=True)
+    author_meal = models.ForeignKey('users.MyUser', on_delete=models.CASCADE, default=1, related_name="meals_author")
 
     @property
     def kcals(self):

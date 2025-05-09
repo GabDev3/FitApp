@@ -3,20 +3,28 @@ from .serializers import (ProductCreateSerializer, ProductGetSerializer,
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from .models import Product
+from .services import ProductService
 
-class CreateProductView(generics.ListCreateAPIView):
+class CreateProductView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return Product.objects.filter(author=user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            serializer.save(author=self.request.user)
-        else:
-            print(serializer.errors)
+        product = ProductService.create_product(
+            validated_data=serializer.validated_data,
+            user=request.user
+        )
+
+        output_serializer = ProductGetSerializer(product)
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+    # def perform_create(self, serializer):
+    #     if serializer.is_valid():
+    #         serializer.save(author_product=self.request.user)
+    #     else:
+    #         print(serializer.errors)
 
 class GetProductView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
