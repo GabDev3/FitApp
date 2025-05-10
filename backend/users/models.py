@@ -5,8 +5,8 @@ class MyUser(AbstractUser):
     userDetails = models.OneToOneField('UserDetails', on_delete=models.CASCADE, null=True, blank=True, related_name="user_details")
 
     class Role(models.TextChoices):
-        ADMIN = 'ADMIN', 'Admin'
-        USER = 'USER', 'User'
+        ADMIN = 'Admin'
+        USER = 'User'
 
     role = models.CharField(
         max_length=20,
