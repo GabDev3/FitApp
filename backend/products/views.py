@@ -20,11 +20,7 @@ class CreateProductView(generics.CreateAPIView):
 
         output_serializer = ProductGetSerializer(product)
         return Response(output_serializer.data, status=status.HTTP_201_CREATED)
-    # def perform_create(self, serializer):
-    #     if serializer.is_valid():
-    #         serializer.save(author_product=self.request.user)
-    #     else:
-    #         print(serializer.errors)
+
 
 class GetProductView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
