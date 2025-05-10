@@ -1,5 +1,4 @@
 from .repositories import ProductRepository
-from django.core.exceptions import ObjectDoesNotExist
 
 class ProductService:
 
@@ -14,10 +13,7 @@ class ProductService:
 
     @staticmethod
     def get_product(product_id):
-        try:
-            return ProductRepository.get_by_id(product_id)
-        except ObjectDoesNotExist:
-            return None
+        return ProductRepository.get_by_id(product_id)
 
     @staticmethod
     def delete_product(product_id):
