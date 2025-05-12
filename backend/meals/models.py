@@ -1,7 +1,4 @@
 from django.db import models
-# from products.models import Product
-
-# Create your models here.
 
 
 class Meal(models.Model):
@@ -16,7 +13,6 @@ class Meal(models.Model):
         return total_kcal
 
 
-
 class MealProduct(models.Model):
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
     product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
@@ -25,3 +21,8 @@ class MealProduct(models.Model):
     def __str__(self):
         return f"{self.quantity}x {self.product.name} in {self.meal.name}"
 
+
+class UserMeal(models.Model):
+    meal = models.ForeignKey('meals.Meal', on_delete=models.CASCADE, related_name="user_meal")
+    user = models.ForeignKey('users.MyUser', on_delete=models.CASCADE, related_name="user_meal")
+    consumed_at = models.DateTimeField(null=False, blank=True, auto_now=True)

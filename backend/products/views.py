@@ -2,9 +2,9 @@ from .serializers import (ProductCreateSerializer, ProductGetSerializer,
                           ProductRemoveSerializer, ProductEditSerializer)
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
-from .models import Product
+# from .models import Product
 from .services import ProductService
-from users.models import MyUser
+# from users.models import MyUser
 
 
 class CreateProductView(generics.CreateAPIView):
@@ -44,7 +44,6 @@ class GetAllProductsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
         products = ProductService.list_all_products()
         return products
 
