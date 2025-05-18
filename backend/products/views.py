@@ -4,6 +4,7 @@ from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 # from .models import Product
 from .services import ProductService
+from users.services import UserService
 # from users.models import MyUser
 
 
@@ -71,10 +72,10 @@ class ProductRemoveView(generics.DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         author = ProductService.get_product_author(kwargs['id'])
-        if author.id != request.user.id:
-            return Response({"detail": "You can only modify your own products."},
+        if author.id != request.user.id and not UserService.user_is_admin(request.user.id):
+            return Response({"detail": "You can't edit this product unless you're an author or an admin."},
                             status=status.HTTP_403_FORBIDDEN)
-        if author.id == request.user.id:
+        if author.id == request.user.id or UserService.user_is_admin(request.user.id):
             product = ProductService.get_product(kwargs['id'])
             serializer = self.get_serializer(product)
 
@@ -90,14 +91,14 @@ class ProductEditView(generics.RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         author = ProductService.get_product_author(kwargs['id'])
-        if author.id != request.user.id:
-            return Response({"detail": "You can only modify your own products."},
+        if author.id != request.user.id and not UserService.user_is_admin(request.user.id):
+            return Response({"detail": "You can't edit this product unless you're an author or an admin."},
                             status=status.HTTP_403_FORBIDDEN)
         if not request.data:
             return Response({"detail": "No data provided."},
                             status=status.HTTP_400_BAD_REQUEST)
-        if author.id == request.user.id:
-            serializer = self.get_serializer(data=request.data)
+        if author.id == request.user.id or UserService.user_is_admin(request.user.id):
+            serializer = self.get_serializer(data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             updated_product = ProductService.update_product(kwargs['id'], serializer.validated_data)
             output_serializer = self.get_serializer(updated_product)

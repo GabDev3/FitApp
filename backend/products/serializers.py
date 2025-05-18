@@ -36,5 +36,5 @@ class ProductEditSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'carbohydrates', 'complex_carbs', 'simple_carbs', 'fiber',
-            'fats', 'saturated_fat', 'unsaturated_fat', 'protein', 'kcal', 'author_product'
+            'fats', 'saturated_fat', 'unsaturated_fat', 'protein'
         ]
