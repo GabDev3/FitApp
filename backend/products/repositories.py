@@ -11,6 +11,15 @@ class ProductRepository:
         return Product.objects.get(id=product_id)
 
     @staticmethod
+    def get_all():
+        return Product.objects.all()
+
+    @staticmethod
+    def get_product_author(product_id):
+        product = Product.objects.get(id=product_id)
+        return product.author_product if product else None
+
+    @staticmethod
     def create(data):
         return Product.objects.create(**data)
 

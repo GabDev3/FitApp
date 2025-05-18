@@ -1,56 +1,36 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-
-MyUser = get_user_model()  # This will fetch 'users.MyUser'
+from .models import MyUser
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
-        fields = ['id', 'username', 'email', 'age', 'dailyIntake']  # or any other fields you want to expose
+        fields = ['id', 'email', 'first_name', 'last_name', 'role', 'height',
+                  'weight', 'activity_level', 'goal', 'dailyIntake', 'age']
+        read_only_fields = fields
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
-        fields = ['id', 'username', 'email', 'password', 'age', 'dailyIntake']
+        fields = ['id', 'email', 'password', 'first_name', 'last_name', 'height',
+                  'weight', 'activity_level', 'goal', 'dailyIntake', 'age']
         extra_kwargs = {'password': {'write_only': True}}  # Don't expose password
 
-    def create(self, validated_data):
-        daily_intake = validated_data.pop('dailyIntake', None)  # Handle dailyIntake if it's optional
 
-        user = MyUser.objects.create_user(**validated_data)  # Use MyUser for creation
-
-        # If dailyIntake was passed, set it after the user is created
-        if daily_intake is not None:
-            user.dailyIntake = daily_intake
-            user.save()
-
-        return user
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyUser
+        fields = ['email', 'first_name', 'last_name', 'height',
+                  'weight', 'activity_level', 'goal', 'dailyIntake', 'age']
 
 
 class UserLoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=255)
-    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
 
-    class Meta:
-        fields = ['username', 'password']
 
-    def validate(self, data):
-        username = data.get("username")
-        password = data.get("password")
+class UserEditRoleSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    role = serializers.CharField(max_length=20)
 
-        # Ensure both fields are provided
-        if not username or not password:
-            raise serializers.ValidationError("Both username and password are required")
-
-        # Check if the user exists
-        user = MyUser.objects.filter(username=username).first()
-        if user is None:
-            raise serializers.ValidationError("Invalid credentials")
-
-        # Check if the password matches
-        if not user.check_password(password):
-            raise serializers.ValidationError("Invalid credentials")
-
-        return data

@@ -2,8 +2,11 @@ from .serializers import (ProductCreateSerializer, ProductGetSerializer,
                           ProductRemoveSerializer, ProductEditSerializer)
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
-from .models import Product
+# from .models import Product
 from .services import ProductService
+from users.services import UserService
+# from users.models import MyUser
+
 
 class CreateProductView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer
@@ -20,41 +23,83 @@ class CreateProductView(generics.CreateAPIView):
 
         output_serializer = ProductGetSerializer(product)
         return Response(output_serializer.data, status=status.HTTP_201_CREATED)
-    # def perform_create(self, serializer):
-    #     if serializer.is_valid():
-    #         serializer.save(author_product=self.request.user)
-    #     else:
-    #         print(serializer.errors)
+
+
+class GetAllUsersProductsView(generics.ListAPIView):
+    serializer_class = ProductGetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        products = ProductService.list_user_products(user)
+        return products
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetAllProductsView(generics.ListAPIView):
+    serializer_class = ProductGetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        products = ProductService.list_all_products()
+        return products
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class GetProductView(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
     serializer_class = ProductGetSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
+
+    def retrieve(self, request, *args, **kwargs):
+        product = ProductService.get_product(kwargs['id'])
+        serializer = self.get_serializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ProductRemoveView(generics.DestroyAPIView):
-    queryset = Product.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductRemoveSerializer
     lookup_field = 'id'
 
     def destroy(self, request, *args, **kwargs):
-        # Get the object to delete
-        product = self.get_object()
+        author = ProductService.get_product_author(kwargs['id'])
+        if author.id != request.user.id and not UserService.user_is_admin(request.user.id):
+            return Response({"detail": "You can't edit this product unless you're an author or an admin."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if author.id == request.user.id or UserService.user_is_admin(request.user.id):
+            product = ProductService.get_product(kwargs['id'])
+            serializer = self.get_serializer(product)
 
-        # Serialize the product (to return its data after deletion)
-        serializer = self.get_serializer(product)
+            ProductService.delete_product(kwargs['id'])
 
-        # Perform the deletion
-        product.delete()
-
-        # Return the serialized data of the deleted product
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class ProductEditView(generics.RetrieveUpdateAPIView):
-    queryset = Product.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductEditSerializer
     lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        author = ProductService.get_product_author(kwargs['id'])
+        if author.id != request.user.id and not UserService.user_is_admin(request.user.id):
+            return Response({"detail": "You can't edit this product unless you're an author or an admin."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if not request.data:
+            return Response({"detail": "No data provided."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if author.id == request.user.id or UserService.user_is_admin(request.user.id):
+            serializer = self.get_serializer(data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            updated_product = ProductService.update_product(kwargs['id'], serializer.validated_data)
+            output_serializer = self.get_serializer(updated_product)
+            return Response(output_serializer.data, status=status.HTTP_200_OK)
