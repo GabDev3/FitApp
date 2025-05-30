@@ -53,23 +53,35 @@ class MealRemoveSerializer(serializers.ModelSerializer):
 
 
 class MealProductEditSerializer(serializers.ModelSerializer):
-    product_id = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(),
-        source='product'
-    )
+    product_id = serializers.IntegerField(min_value=1)
+    quantity = serializers.FloatField(min_value=0.1)
 
     class Meta:
         model = MealProduct
         fields = ['product_id', 'quantity']
 
+    def validate_product_id(self, value):
+        if not Product.objects.filter(id=value).exists():
+            raise serializers.ValidationError(f"Product with ID {value} does not exist")
+        return value
+
 
 class MealEditSerializer(serializers.ModelSerializer):
     meal_products = MealProductEditSerializer(many=True)
+    name = serializers.CharField(required=True, min_length=1)
 
     class Meta:
         model = Meal
-        fields = ['id', 'name', 'meal_products']
+        fields = ['name', 'meal_products']
 
-    def update(self, instance, validated_data):
-        # Let the service layer handle the update logic
-        return instance
+    def validate_meal_products(self, value):
+        if not value:
+            raise serializers.ValidationError("At least one product is required")
+        return value
+
+    def validate(self, data):
+        if not data.get('name'):
+            raise serializers.ValidationError({"name": "Name is required"})
+        if not data.get('meal_products'):
+            raise serializers.ValidationError({"meal_products": "At least one product is required"})
+        return data

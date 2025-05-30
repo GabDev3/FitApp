@@ -6,6 +6,7 @@ from .services import MealService
 from rest_framework import generics, permissions, status
 from users.services import UserService
 
+
 class CreateMealView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MealCreateSerializer
@@ -22,8 +23,7 @@ class GetMealView(generics.GenericAPIView):
     lookup_field = 'id'
 
     def get(self, request, *args, **kwargs):
-        meal_id = kwargs.get('id')
-        meal = Meal.objects.filter(id=meal_id).first()
+        meal = MealService.get_meal_by_id(self.kwargs.get('id'))
 
         if not meal:
             return Response({"error": "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -33,7 +33,7 @@ class GetMealView(generics.GenericAPIView):
 
 
 class GetAllMealsView(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = MealGetSerializer
 
     def get(self, request, *args, **kwargs):
@@ -60,7 +60,26 @@ class RemoveMealView(generics.DestroyAPIView):
 
 
 class MealEditView(generics.RetrieveUpdateAPIView):
-    queryset = Meal.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = MealEditSerializer
     lookup_field = 'id'
+
+    def get_queryset(self):
+        meal_id = self.kwargs.get('id')
+        meal = MealService.get_meal_by_id(meal_id)
+        if not meal:
+            return None
+        return meal
+
+    def put(self, request, *args, **kwargs):
+        meal = self.get_queryset()
+        if meal is None:
+            return Response({"error": "Meal not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if not MealService.user_is_author(meal.id, request.user.id) and not UserService.user_is_admin(request.user.id):
+            return Response({"error": "You do not have permission to edit this meal"}, status=status.HTTP_403_FORBIDDEN)
+
+        meal_id = self.kwargs.get('id')
+        updated_meal = MealService.update_meal(meal_id, request.data)
+        serializer = self.get_serializer(updated_meal)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -14,34 +14,36 @@ class MealService:
         return MealRepository.remove_meal(meal_id)
 
     @staticmethod
-    def update_meal(data):
+    def update_meal(meal_id: int, data: dict):
         """
-        Validates input and updates meal via MealRepository.
+        Validates input and updates the entire meal via MealRepository.
         """
+        meal = MealRepository.get_meal_by_id(meal_id)
+        if not meal:
+            raise ValueError("Meal not found")
+
         serializer = MealEditSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-
         validated_data = serializer.validated_data
-        meal_id = data.get("id")
-        meal_products = validated_data.pop("meal_products")
-        name = validated_data.get("name")
 
-        # Update basic meal fields
-        meal = MealRepository.get_meal_by_id(meal_id)
-        meal.name = name
+        # Update meal name
+        meal.name = validated_data['name']
         meal.save()
 
-        # Prepare meal_product data for repository
-        simplified_meal_products = [
+        # Update meal products
+        meal_products = [
             {
-                "product_id": mp["product"].id,
-                "quantity": mp["quantity"]
+                "product_id": mp['product_id'],
+                "quantity": mp['quantity']
             }
-            for mp in meal_products
+            for mp in validated_data['meal_products']
         ]
 
-        # Call repository to update related products
-        MealRepository.update_meal(meal_id=meal.id, meal_products=simplified_meal_products)
+        try:
+            MealRepository.update_meal(meal=meal, meal_products=meal_products)
+        except Exception as e:
+            print(f"Error in update_meal: {e}")  # Debug log
+            raise
 
         return meal
 

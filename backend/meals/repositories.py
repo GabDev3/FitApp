@@ -1,6 +1,9 @@
 from .models import Meal, MealProduct, UserMeal
 from typing import List, Dict
 from products.repositories import ProductRepository
+from django.db import transaction
+from products.models import Product
+from typing import List, Dict
 
 class MealRepository:
 
@@ -29,28 +32,50 @@ class MealRepository:
         """
         Replace existing MealProducts for a meal with new ones.
         """
-        # Check if the meal exists
         if not meal:
-            return False
+            raise ValueError("Meal object is None")
 
-        # Delete existing MealProducts
-        meal.meal_products.all().delete()
+        print(f"Updating meal {meal.id} with products: {meal_products}")  # Debug log
 
-        # Create new MealProducts
-        for item in meal_products:
-            product_id = item.get("product_id")
-            quantity = item.get("quantity", 1)
+        try:
+            with transaction.atomic():
+                # Get existing products for comparison
+                existing_products = set(meal.meal_products.values_list('product_id', flat=True))
+                print(f"Existing products: {existing_products}")  # Debug log
 
-            if not product_id:
-                continue  # or raise an error
+                # Delete existing MealProducts
+                deleted_count = meal.meal_products.all().delete()
+                print(f"Deleted {deleted_count} existing meal products")  # Debug log
 
-            product = ProductRepository.get_by_id(product_id)
+                # Create new MealProducts
+                new_products = []
+                for item in meal_products:
+                    product_id = item.get('product_id')
+                    quantity = item.get('quantity')
 
-            MealProduct.objects.create(
-                meal=meal,
-                product=product,
-                quantity=quantity
-            )
+                    print(f"Processing product_id: {product_id}, quantity: {quantity}")  # Debug log
+
+                    if not product_id or not quantity:
+                        raise ValueError(f"Invalid product data: {item}")
+
+                    if not Product.objects.filter(id=product_id).exists():
+                        raise ValueError(f"Product with ID {product_id} does not exist")
+
+                    new_product = MealProduct.objects.create(
+                        meal=meal,
+                        product_id=product_id,
+                        quantity=quantity
+                    )
+                    new_products.append(new_product)
+
+                print(f"Created {len(new_products)} new meal products")  # Debug log
+
+        except Exception as e:
+            print(f"Error in repository update_meal: {str(e)}")  # Debug log
+            print(f"Error type: {type(e)}")  # Debug log
+            raise
+
+        return True
 
     @staticmethod
     def get_meal_by_id(id: int):
