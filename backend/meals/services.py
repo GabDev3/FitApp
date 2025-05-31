@@ -56,6 +56,14 @@ class MealService:
         return MealGetSerializer(meals, many=True).data
 
     @staticmethod
+    def get_all_meals_current_user(user_id: int):
+        """
+        Fetches all meals of the current user.
+        """
+        meals = MealRepository.get_all_user_id(user_id)
+        return MealGetSerializer(meals, many=True).data
+
+    @staticmethod
     def user_is_author(meal_id: int, user_id: int) -> bool:
         """
         Checks if the user is the author of the meal.

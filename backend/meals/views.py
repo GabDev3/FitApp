@@ -41,6 +41,16 @@ class GetAllMealsView(generics.GenericAPIView):
         return Response(meals, status=status.HTTP_200_OK)
 
 
+class GetAllMealsCurrentUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = MealGetSerializer
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.user.id
+        meals = MealService.get_all_meals_current_user(user_id)
+        return Response(meals, status=status.HTTP_200_OK)
+
+
 class RemoveMealView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MealGetSerializer
