@@ -14,7 +14,7 @@ class Meal(models.Model):
 
 
 class MealProduct(models.Model):
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='meal_products')
     product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     quantity = models.FloatField(default=1)
 

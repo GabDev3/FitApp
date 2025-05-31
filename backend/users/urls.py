@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import CreateUserView, LoginUserView, GetCurrentUserInfoView, UserEditCurrentView, UserDeleteCurrentView, AdminGetUserView, AdminChangeUserRole, AdminGetAllUsers, AdminDeleteUser
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("user/register/", CreateUserView.as_view(), name="register"),
     path("user/login/", LoginUserView.as_view(), name="login"),
     path("user/info/current/", GetCurrentUserInfoView.as_view(), name="current-user-info"),

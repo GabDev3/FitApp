@@ -8,6 +8,7 @@ import ProductInfo from "./pages/ProductInfo"
 import CreateProduct from "./pages/CreateProduct"
 import ProtectedRoute from "./components/ProtectedRoute"
 
+import { GlobalStyles } from "@mui/material";
 
 function Logout() {
     localStorage.clear()
@@ -23,6 +24,20 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
+  <>
+    <GlobalStyles
+      styles={{
+        "html, body, #root": {
+          margin: 0,
+          padding: 0,
+          height: "100%",
+          width: "100%",
+          overflowX: "hidden",
+          overflowY: "hidden", // prevent page vertical scroll
+        },
+      }}
+    />
+
     <BrowserRouter>
         <Routes>
             <Route
@@ -48,6 +63,7 @@ function App() {
 
         </Routes>
     </BrowserRouter>
+    </>
   )
 }
 
