@@ -8,7 +8,7 @@ import {
   Grid
 } from '@mui/material';
 
-const AddProductDialog = ({ open, onClose, product, onProductChange, onSave }) => {
+const AddProductDialog = ({ open, onClose, product, onProductChange, onSave, isEditing }) => {
   const handleChange = (field) => (e) => {
     onProductChange({
       ...product,
@@ -22,7 +22,7 @@ const AddProductDialog = ({ open, onClose, product, onProductChange, onSave }) =
         color: '#44A08D',
         borderBottom: '2px solid #4ECDC4'
       }}>
-        Dodaj nowy produkt
+        {isEditing ? "Edytuj produkt" : "Dodaj nowy produkt"}
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>

@@ -23,6 +23,40 @@ const ProductSection = ({ showSnackbar }) => {
     protein: 0,
     kcal: 0
   });
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
+
+    const handleEditClick = (product) => {
+      setEditingProduct(product);
+      setDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+      setDialogOpen(false);
+      setEditingProduct(null);
+    };
+
+    const handleProductChange = (updatedProduct) => {
+      setEditingProduct(updatedProduct);
+    };
+
+    const handleSave = async () => {
+      try {
+        if (editingProduct.id) {
+          const { id, author_product, kcal, carbohydrates, fats, ...updateData } = editingProduct;
+          await api.put(`/api/product/edit/${editingProduct.id}/`, updateData);
+          await fetchProducts();
+          showSnackbar("Product updated successfully!", "success");
+        } else {
+          await createProduct();
+        }
+        handleDialogClose();
+      } catch (error) {
+        console.error('Error saving product:', error);
+        showSnackbar("Error saving product", "error");
+      }
+    };
+
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -145,11 +179,7 @@ const ProductSection = ({ showSnackbar }) => {
                 },
               }}>
                 {filteredProducts.map((product) => (
-                  <Fade
-                    key={product.id}
-                    in={true}
-                    timeout={400}
-                  >
+                  <Fade key={product.id} in={true} timeout={400}>
                     <div>
                       <ExpandableRow
                         item={product}
@@ -160,24 +190,33 @@ const ProductSection = ({ showSnackbar }) => {
                         rightColumnTitle="Białko i Tłuszcze"
                         leftColumnData={renderCarbs}
                         rightColumnData={renderProteinsAndFats}
-                        onEdit={editProduct}
+                        onEdit={handleEditClick}
                         onDelete={deleteProduct}
                       />
                     </div>
                   </Fade>
                 ))}
+                <AddProductDialog
+                  open={dialogOpen}
+                  onClose={handleDialogClose}
+                  product={editingProduct || {
+                    name: '',
+                    complex_carbs: 0,
+                    simple_carbs: 0,
+                    fiber: 0,
+                    protein: 0,
+                    saturated_fat: 0,
+                    unsaturated_fat: 0,
+                    kcal: 0
+                  }}
+                  onProductChange={handleProductChange}
+                  onSave={handleSave}
+                  isEditing={Boolean(editingProduct)}
+                />
               </Box>
             )}
         </Box>
       </Fade>
-
-      <AddProductDialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        product={newProduct}
-        onProductChange={setNewProduct}
-        onSave={createProduct}
-      />
     </>
   );
 };
