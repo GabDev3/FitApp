@@ -125,3 +125,12 @@ class RemoveConsumedMealView(generics.GenericAPIView):
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MealHistoryView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.user.id
+        meal_history = MealService.get_meal_history_ids(user_id)
+        return Response(meal_history, status=status.HTTP_200_OK)

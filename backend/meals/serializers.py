@@ -101,3 +101,12 @@ class UserMealDeleteSerializer(serializers.ModelSerializer):
         model = UserMeal
         fields = ['id']
         read_only_fields = fields
+
+
+class MealHistorySerializer(serializers.ModelSerializer):
+    meal_id = serializers.IntegerField(source='meal.id')
+    consumed_at = serializers.DateTimeField()
+
+    class Meta:
+        model = UserMeal
+        fields = ['meal_id', 'consumed_at']

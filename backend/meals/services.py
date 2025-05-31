@@ -1,5 +1,6 @@
 from .repositories import MealRepository
-from .serializers import MealCreateSerializer, MealEditSerializer, MealGetSerializer, UserMealGetSerializer, UserMealDeleteSerializer
+from .serializers import MealCreateSerializer, MealEditSerializer, MealGetSerializer, UserMealGetSerializer, UserMealDeleteSerializer, MealHistorySerializer
+
 
 class MealService:
 
@@ -104,3 +105,11 @@ class MealService:
 
         MealRepository.remove_meal_from_history(user_meal)
         return True
+
+    @staticmethod
+    def get_meal_history_ids(user_id: int):
+        """
+        Fetch meal history for a user and serialize the meal IDs and consumed_at field.
+        """
+        user_meals = MealRepository.get_meal_history(user_id)
+        return MealHistorySerializer(user_meals, many=True).data
