@@ -1,5 +1,5 @@
 from .repositories import MealRepository
-from .serializers import MealCreateSerializer, MealEditSerializer, MealGetSerializer
+from .serializers import MealCreateSerializer, MealEditSerializer, MealGetSerializer, UserMealGetSerializer, UserMealDeleteSerializer
 
 class MealService:
 
@@ -76,3 +76,31 @@ class MealService:
     @staticmethod
     def get_meal_by_id(id: int):
         return MealRepository.get_meal_by_id(id)
+
+    # services.py modification
+    @staticmethod
+    def add_consumed_meal(meal_id: int, user_id: int):
+        """
+        Adds a consumed meal to the user's meal history.
+        """
+        meal = MealRepository.get_meal_by_id(meal_id)
+        if not meal:
+            raise ValueError("Meal not found")
+
+        user_meal = MealRepository.add_meal_to_history(meal, user_id)
+        return UserMealGetSerializer(user_meal).data
+
+    @staticmethod
+    def remove_consumed_meal(user_meal_id: int, user_id: int):
+        """
+        Removes a consumed meal from the user's meal history.
+        """
+        user_meal = MealRepository.get_user_meal_by_id(user_meal_id)
+        if not user_meal:
+            raise ValueError("User meal not found")
+
+        if user_meal.user.id != user_id:
+            raise ValueError("Not authorized to remove this meal")
+
+        MealRepository.remove_meal_from_history(user_meal)
+        return True

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Meal, MealProduct
+from .models import Meal, MealProduct, UserMeal
 from products.models import Product
 
 
@@ -85,3 +85,19 @@ class MealEditSerializer(serializers.ModelSerializer):
         if not data.get('meal_products'):
             raise serializers.ValidationError({"meal_products": "At least one product is required"})
         return data
+
+
+class UserMealGetSerializer(serializers.ModelSerializer):
+    meal = MealGetSerializer(read_only=True)
+
+    class Meta:
+        model = UserMeal
+        fields = ['id', 'meal', 'consumed_at']
+        read_only_fields = fields
+
+
+class UserMealDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMeal
+        fields = ['id']
+        read_only_fields = fields

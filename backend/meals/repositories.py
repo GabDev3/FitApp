@@ -146,3 +146,12 @@ class MealRepository:
             return meal.author_meal
         except Meal.DoesNotExist:
             return None
+
+    def get_user_meal_by_id(user_meal_id: int):
+        """
+        Get a specific user meal by its ID.
+        """
+        try:
+            return UserMeal.objects.get(id=user_meal_id)
+        except UserMeal.DoesNotExist:
+            return None

@@ -1,5 +1,5 @@
 from .serializers import (MealCreateSerializer, MealGetSerializer,
-                          MealRemoveSerializer, MealEditSerializer)
+                          MealRemoveSerializer, MealEditSerializer, UserMealDeleteSerializer, UserMealGetSerializer)
 from .models import Meal, MealProduct
 from rest_framework.response import Response
 from .services import MealService
@@ -93,3 +93,35 @@ class MealEditView(generics.RetrieveUpdateAPIView):
         updated_meal = MealService.update_meal(meal_id, request.data)
         serializer = self.get_serializer(updated_meal)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AddConsumedMealView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserMealGetSerializer
+    lookup_url_kwarg = 'meal_id'
+
+    def post(self, request, *args, **kwargs):
+        meal_id = self.kwargs.get(self.lookup_url_kwarg)  # Retrieve meal_id from URL
+        try:
+            result = MealService.add_consumed_meal(meal_id, request.user.id)
+            return Response(result, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RemoveConsumedMealView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserMealDeleteSerializer
+    lookup_url_kwarg = 'user_meal_id'
+
+    def delete(self, request, *args, **kwargs):
+        user_meal_id = self.kwargs.get(self.lookup_url_kwarg)  # Retrieve user_meal_id from URL
+        try:
+            MealService.remove_consumed_meal(user_meal_id, request.user.id)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
