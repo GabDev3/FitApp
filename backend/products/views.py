@@ -90,16 +90,17 @@ class ProductEditView(generics.RetrieveUpdateAPIView):
     lookup_field = 'id'
 
     def update(self, request, *args, **kwargs):
-        author = ProductService.get_product_author(kwargs['id'])
-        if author.id != request.user.id and not UserService.user_is_admin(request.user.id):
-            return Response({"detail": "You can't edit this product unless you're an author or an admin."},
-                            status=status.HTTP_403_FORBIDDEN)
-        if not request.data:
-            return Response({"detail": "No data provided."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        if author.id == request.user.id or UserService.user_is_admin(request.user.id):
-            serializer = self.get_serializer(data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            updated_product = ProductService.update_product(kwargs['id'], serializer.validated_data)
-            output_serializer = self.get_serializer(updated_product)
-            return Response(output_serializer.data, status=status.HTTP_200_OK)
+        product_id = kwargs['id']
+        user = request.user
+        data = request.data
+
+        if not data:
+            return Response({"detail": "No data provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = ProductService.update_product(product_id, user, data)
+
+        if isinstance(result, Response):
+            return result  # already a Response object with error
+
+        serializer = self.get_serializer(result)
+        return Response(serializer.data, status=status.HTTP_200_OK)

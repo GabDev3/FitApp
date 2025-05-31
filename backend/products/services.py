@@ -1,4 +1,8 @@
 from .repositories import ProductRepository
+from .serializers import ProductEditSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from users.services import UserService
 
 class ProductService:
 
@@ -25,9 +29,21 @@ class ProductService:
         return ProductRepository.delete(product)
 
     @staticmethod
-    def update_product(product_id, validated_data):
+    def update_product(product_id, user, data):
         product = ProductRepository.get_by_id(product_id)
-        return ProductRepository.update(product, validated_data)
+        author = product.author_product
+
+        # Authorization
+        if author.id != user.id and not UserService.user_is_admin(user.id):
+            return Response({"detail": "You can't edit this product unless you're an author or an admin."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        # Serializer validation
+        serializer = ProductEditSerializer(instance=product, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Validated data passed to repo
+        return ProductRepository.update(product, serializer.validated_data)
 
     @staticmethod
     def get_product_author(product_id):
