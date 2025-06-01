@@ -31,6 +31,13 @@ class ProductRepository:
     @staticmethod
     def update(product, data):
         for attr, value in data.items():
-            setattr(product, attr, value)
+            current_value = getattr(product, attr, None)
+            if current_value != value:
+                setattr(product, attr, value)
+
+        # Final double-check: don't allow duplicate name
+        if Product.objects.exclude(id=product.id).filter(name=product.name).exists():
+            raise serializers.ValidationError({"name": "Product with this name already exists."})
+
         product.save()
         return product
