@@ -85,35 +85,36 @@ useEffect(() => {
 
       const products = allProductsResponse.data;
 
-      const mealsWithDetails = await Promise.all(
-        mealsHistoryResponse.data.map(async (historyItem) => {
-          const meal = allMealsResponse.data.find(m => m.id === historyItem.meal_id);
-          if (!meal) return null;
+const mealsWithDetails = await Promise.all(
+  mealsHistoryResponse.data.map(async (historyItem) => {
+    const meal = allMealsResponse.data.find(m => m.id === historyItem.meal_id);
+    if (!meal) return null;
 
-          const mealNutrients = meal.meal_products.reduce((acc, mp) => {
-            const product = products.find(p => p.id === mp.product_id);
-            if (product) {
-              return {
-                protein: acc.protein + (mp.quantity * product.protein) / 100,
-                carbs: acc.carbs + (mp.quantity * product.carbohydrates) / 100,
-                fat: acc.fat + (mp.quantity * product.fats) / 100
-              };
-            }
-            return acc;
-          }, { protein: 0, carbs: 0, fat: 0 });
+    const mealNutrients = meal.meal_products.reduce((acc, mp) => {
+      const product = products.find(p => p.id === mp.product_id);
+      if (product) {
+        return {
+          protein: acc.protein + (mp.quantity * product.protein) / 100,
+          carbs: acc.carbs + (mp.quantity * product.carbohydrates) / 100,
+          fat: acc.fat + (mp.quantity * product.fats) / 100
+        };
+      }
+      return acc;
+    }, { protein: 0, carbs: 0, fat: 0 });
 
-          return {
-            id: historyItem.meal_id,
-            consumed_at: historyItem.consumed_at,
-            meal: {
-              ...meal,
-              protein: Number(mealNutrients.protein.toFixed(1)),
-              carbs: Number(mealNutrients.carbs.toFixed(1)),
-              fat: Number(mealNutrients.fat.toFixed(1))
-            }
-          };
-        })
-      );
+    return {
+      id: historyItem.id, // This is the UserMeal id
+      meal_id: historyItem.meal_id, // This is the Meal id
+      consumed_at: historyItem.consumed_at,
+      meal: {
+        ...meal,
+        protein: Number(mealNutrients.protein.toFixed(1)),
+        carbs: Number(mealNutrients.carbs.toFixed(1)),
+        fat: Number(mealNutrients.fat.toFixed(1))
+      }
+    };
+  })
+);
 
       const filteredMeals = mealsWithDetails
         .filter(meal => meal !== null)
@@ -147,19 +148,21 @@ const calculateDailySummary = (mealsList) => {
   setDailySummary(summary);
 };
 
-  const handleRemoveMeal = async (mealId) => {
-    try {
-        await api.delete(`/api/meal_history/remove/${mealId}/`);
-        const response = await api.get('/api/meal_history/get/', {
-          params: { date: selectedDate }
-        });
+const handleRemoveMeal = async (mealId) => {
+  try {
+    // Log the mealId to verify it's correct
+    console.log('Deleting meal with id:', mealId);
 
-      setMeals(response.data);
-      calculateDailySummary(response.data);
-    } catch (error) {
-      console.error('Error removing meal:', error);
-    }
-  };
+    await api.delete(`/api/meal_history/remove/${mealId}/`);
+
+    // Update the meals state by removing the deleted meal
+    const updatedMeals = meals.filter(meal => meal.id !== mealId);
+    setMeals(updatedMeals);
+    calculateDailySummary(updatedMeals);
+  } catch (error) {
+    console.error('Error removing meal:', error);
+  }
+};
 
   const handleAddMeal = async () => {
     if (!selectedMeal) return;
@@ -243,6 +246,8 @@ const calculateDailySummary = (mealsList) => {
             size="small"
             onClick={(e) => {
               e.stopPropagation();
+              // Add console.log to verify the ID
+              console.log('Removing meal with id:', historyItem.id);
               handleRemoveMeal(historyItem.id);
             }}
           >
