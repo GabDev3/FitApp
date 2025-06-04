@@ -1,30 +1,31 @@
 import { useState, useEffect } from "react";
 import {
   Box, Container, AppBar, Toolbar, IconButton, Avatar,
-  Menu, MenuItem, Badge, Button, Paper, Divider, Typography // Add Typography here
+  Menu, MenuItem, Badge, Button, Paper, Divider, Typography
 } from "@mui/material";
 import {
   Dashboard, Fastfood, Restaurant, FitnessCenter,
   Notifications, Search, Menu as MenuIcon
 } from "@mui/icons-material";
-import DashboardSection from "./sections/DashboardSection";
 import ProductSection from "./sections/ProductSection";
 import MealSection from "./sections/MealSection";
 import GoalsSection from "./sections/GoalsSection";
+import ProfileDialog from "./sections/elements/ProfileDialog"; // Add this import
 import api from "../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
 
 const HomeView = () => {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("dashboard");
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState(null);
   const [meals, setMeals] = useState([]);
   const [notificationCount] = useState(3);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false); // Add this state
 
   const sections = [
-    { id: "dashboard", name: "Dashboard", icon: <Dashboard /> },
     { id: "products", name: "Products", icon: <Fastfood /> },
     { id: "meals", name: "Meals", icon: <Restaurant /> },
     { id: "goals", name: "Goals", icon: <FitnessCenter /> }
@@ -32,9 +33,6 @@ const HomeView = () => {
 
   const fetchUserData = async () => {
     try {
-      // Replace with your actual API endpoint
-      // const response = await api.get("/api/user/profile/");
-      // setUser(response.data);
       const userData = await api.get("/api/user/info/current/");
       setUser(userData.data);
     } catch (error) {
@@ -64,8 +62,26 @@ const HomeView = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleLogout = () => {
+    navigate('/logout');
+  };
+
   const handleUserMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  // Add these handlers
+  const handleProfileClick = () => {
+    setProfileDialogOpen(true);
+    handleUserMenuClose();
+  };
+
+  const handleProfileDialogClose = () => {
+    setProfileDialogOpen(false);
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   const showSnackbar = (message, severity) => {
@@ -75,16 +91,12 @@ const HomeView = () => {
 
   const renderSection = () => {
     switch (activeSection) {
-      case "dashboard":
-        return <DashboardSection user={user} meals={meals} />;
       case "products":
         return <ProductSection showSnackbar={showSnackbar} />;
       case "meals":
         return <MealSection showSnackbar={showSnackbar} />;
       case "goals":
         return <GoalsSection user={user} showSnackbar={showSnackbar} />;
-      default:
-        return <DashboardSection user={user} meals={meals} />;
     }
   };
 
@@ -101,7 +113,7 @@ const HomeView = () => {
         borderRight: '1px solid rgba(0, 0, 0, 0.12)'
       }}>
         <Typography variant="h6" sx={{ p: 2, fontWeight: 700, color: '#4ECDC4' }}>
-          NutriTrack
+          Fit App
         </Typography>
         <Divider sx={{ my: 1 }} />
 
@@ -167,14 +179,6 @@ const HomeView = () => {
           }}
         >
           <Toolbar sx={{ justifyContent: 'flex-end' }}>
-            <IconButton sx={{ mr: 1 }}>
-              <Search />
-            </IconButton>
-            <IconButton sx={{ mr: 2 }}>
-              <Badge badgeContent={notificationCount} color="error">
-                <Notifications />
-              </Badge>
-            </IconButton>
             <IconButton onClick={handleUserMenuClick}>
               <Avatar sx={{ width: 36, height: 36 }}>
                 {user?.first_name?.charAt(0) || 'U'}
@@ -183,7 +187,6 @@ const HomeView = () => {
           </Toolbar>
         </AppBar>
 
-        {/* User Menu */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -191,10 +194,9 @@ const HomeView = () => {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handleUserMenuClose}>Profile</MenuItem>
-          <MenuItem onClick={handleUserMenuClose}>Settings</MenuItem>
+          <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
           <Divider />
-          <MenuItem onClick={handleUserMenuClose}>Logout</MenuItem>
+          <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
 
         {/* Content */}
@@ -204,6 +206,15 @@ const HomeView = () => {
           </Container>
         </Box>
       </Box>
+
+      {/* Profile Dialog */}
+      <ProfileDialog
+        open={profileDialogOpen}
+        onClose={handleProfileDialogClose}
+        user={user}
+        onUserUpdate={handleUserUpdate}
+        showSnackbar={showSnackbar}
+      />
     </Box>
   );
 };
