@@ -164,24 +164,67 @@ const handleRemoveMeal = async (mealId) => {
   }
 };
 
-  const handleAddMeal = async () => {
-    if (!selectedMeal) return;
+const handleAddMeal = async () => {
+  if (!selectedMeal) return;
 
-    try {
-        await api.post(`/api/meal_history/add/${selectedMeal}/`, {
-          date: selectedDate
-        });
-        const response = await api.get('/api/meal_history/get/', {
-          params: { date: selectedDate }
-        });
-      setMeals(response.data);
-      calculateDailySummary(response.data);
-      setOpenAddDialog(false);
-      setSelectedMeal('');
-    } catch (error) {
-      console.error('Error adding meal:', error);
-    }
-  };
+  try {
+    // Remove the date parameter since backend handles it
+    await api.post(`/api/meal_history/add/${selectedMeal}/`);
+
+    // Fetch fresh data
+    const [mealsHistoryResponse, allMealsResponse, allProductsResponse] = await Promise.all([
+      api.get('/api/meal_history/get/'),
+      api.get('/api/meal/get_all/'),
+      api.get('/api/product/get_all/')
+    ]);
+
+    const products = allProductsResponse.data;
+
+    const mealsWithDetails = await Promise.all(
+      mealsHistoryResponse.data.map(async (historyItem) => {
+        const meal = allMealsResponse.data.find(m => m.id === historyItem.meal_id);
+        if (!meal) return null;
+
+        const mealNutrients = meal.meal_products.reduce((acc, mp) => {
+          const product = products.find(p => p.id === mp.product_id);
+          if (product) {
+            return {
+              protein: acc.protein + (mp.quantity * product.protein) / 100,
+              carbs: acc.carbs + (mp.quantity * product.carbohydrates) / 100,
+              fat: acc.fat + (mp.quantity * product.fats) / 100
+            };
+          }
+          return acc;
+        }, { protein: 0, carbs: 0, fat: 0 });
+
+        return {
+          id: historyItem.id,
+          consumed_at: historyItem.consumed_at,
+          meal: {
+            ...meal,
+            protein: Number(mealNutrients.protein.toFixed(1)),
+            carbs: Number(mealNutrients.carbs.toFixed(1)),
+            fat: Number(mealNutrients.fat.toFixed(1))
+          }
+        };
+      })
+    );
+
+    const filteredMeals = mealsWithDetails
+      .filter(meal => meal !== null)
+      .filter(meal => {
+        const mealDate = new Date(meal.consumed_at).toISOString().split('T')[0];
+        return mealDate === selectedDate;
+      });
+
+    setMeals(filteredMeals);
+    calculateDailySummary(filteredMeals);
+    setOpenAddDialog(false);
+    setSelectedMeal('');
+  } catch (error) {
+    console.error('Error adding meal:', error);
+  }
+};
 
   return (
     <Box sx={{ p: 3 }}>

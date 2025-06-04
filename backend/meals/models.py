@@ -9,7 +9,7 @@ class Meal(models.Model):
     def kcals(self):
         total_kcal = 0
         for meal_product in self.meal_products.all():
-            total_kcal += meal_product.product.calculate_kcal() * meal_product.quantity
+            total_kcal += meal_product.product.calculate_kcal() * meal_product.quantity / 100
         return total_kcal
 
 

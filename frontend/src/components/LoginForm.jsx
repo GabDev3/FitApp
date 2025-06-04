@@ -13,11 +13,22 @@ import {
     Paper
 } from "@mui/material";
 
+import { keyframes } from '@mui/system';
+
 function LoginForm({ route, method }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const wiggle = keyframes`
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  50% { transform: rotate(-3deg); }
+  75% { transform: rotate(1deg); }`;
+
+    const float = keyframes`
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }`;
 
     const name = "Login";
 
@@ -50,6 +61,7 @@ function LoginForm({ route, method }) {
             }}
         >
             <Paper
+
                 elevation={6}
                 sx={{
                     padding: 5,
@@ -58,6 +70,7 @@ function LoginForm({ route, method }) {
                     maxWidth: 500,
                     backgroundColor: "rgba(255, 255, 255, 0.3)", // semi-transparent white
                     backdropFilter: "blur(10px)", // optional: glass effect
+                    animation: `${float} 3s ease-in-out infinite`
                 }}
             >
                 <Box
@@ -94,7 +107,9 @@ function LoginForm({ route, method }) {
                         color="primary"
                         fullWidth
                         disabled={loading}
-                        sx={{ fontWeight: 600 }}
+                        sx={{ fontWeight: 600,
+                                '&:hover': { animation: `${wiggle} 0.5s ease-in-out`,},}
+                        }
                     >
                         {loading ? <CircularProgress size={24} color="inherit" /> : name}
                     </Button>

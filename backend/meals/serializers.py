@@ -109,4 +109,4 @@ class MealHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserMeal
-        fields = ['meal_id', 'consumed_at']
+        fields = ['id', 'meal_id', 'consumed_at']

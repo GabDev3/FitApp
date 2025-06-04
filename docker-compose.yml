@@ -42,19 +42,19 @@ services:
       - fitapp_network
 
 
-  frontend:
-    build: ./frontend
-    container_name: react_frontend
-    restart: always
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "5173:5173"
-    networks:
-      - fitapp_network
+#  frontend:
+#    build: ./frontend
+#    container_name: react_frontend
+#    restart: always
+#    depends_on:
+#      - backend
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules
+#    ports:
+#      - "5173:5173"
+#    networks:
+#      - fitapp_network
 
 volumes:
   postgres_data:
