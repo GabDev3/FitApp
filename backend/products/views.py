@@ -5,12 +5,32 @@ from rest_framework.response import Response
 # from .models import Product
 from .services import ProductService
 from users.services import UserService
-# from users.models import MyUser
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+from rest_framework.response import Response
 
 
 class CreateProductView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        summary="Create a new product",
+        description="Create a new product with nutritional information",
+        request=ProductCreateSerializer,
+        responses={
+            201: ProductGetSerializer,
+            400: OpenApiExample(
+                'Bad Request',
+                value={'error': 'Invalid data provided'}
+            ),
+            401: OpenApiExample(
+                'Unauthorized',
+                value={'error': 'Authentication required'}
+            )
+        },
+        tags=['Products']
+    )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -29,6 +49,19 @@ class GetAllUsersProductsView(generics.ListAPIView):
     serializer_class = ProductGetSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        summary="Get current user's products",
+        description="Retrieve products created by the current user",
+        responses={
+            200: ProductGetSerializer(many=True),
+            401: OpenApiExample(
+                'Unauthorized',
+                value={'error': 'Authentication required'}
+            )
+        },
+        tags=['Products']
+    )
+
     def get_queryset(self):
         user = self.request.user
         products = ProductService.list_user_products(user)
@@ -43,6 +76,19 @@ class GetAllUsersProductsView(generics.ListAPIView):
 class GetAllProductsView(generics.ListAPIView):
     serializer_class = ProductGetSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        summary="Get all products",
+        description="Retrieve all available products",
+        responses={
+            200: ProductGetSerializer(many=True),
+            401: OpenApiExample(
+                'Unauthorized',
+                value={'error': 'Authentication required'}
+            )
+        },
+        tags=['Products']
+    )
 
     def get_queryset(self):
         products = ProductService.list_all_products()
@@ -59,6 +105,31 @@ class GetProductView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
 
+    @extend_schema(
+        summary="Get product by ID",
+        description="Retrieve a specific product by its ID",
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description='Unique identifier for the product'
+            )
+        ],
+        responses={
+            200: ProductGetSerializer,
+            404: OpenApiExample(
+                'Not Found',
+                value={'error': 'Product not found'}
+            ),
+            401: OpenApiExample(
+                'Unauthorized',
+                value={'error': 'Authentication required'}
+            )
+        },
+        tags=['Products']
+    )
+
     def retrieve(self, request, *args, **kwargs):
         product = ProductService.get_product(kwargs['id'])
         serializer = self.get_serializer(product)
@@ -69,6 +140,31 @@ class ProductRemoveView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductRemoveSerializer
     lookup_field = 'id'
+
+    @extend_schema(
+        summary="Delete a product",
+        description="Delete a product (only by author or admin)",
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description='Unique identifier for the product to delete'
+            )
+        ],
+        responses={
+            204: ProductRemoveSerializer,
+            403: OpenApiExample(
+                'Forbidden',
+                value={'detail': "You can't edit this product unless you're an author or an admin."}
+            ),
+            404: OpenApiExample(
+                'Not Found',
+                value={'error': 'Product not found'}
+            )
+        },
+        tags=['Products']
+    )
 
     def destroy(self, request, *args, **kwargs):
         author = ProductService.get_product_author(kwargs['id'])
@@ -88,6 +184,29 @@ class ProductEditView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProductEditSerializer
     lookup_field = 'id'
+
+    @extend_schema(
+        summary="Update a product",
+        description="Update product information (only by author or admin)",
+        request=ProductEditSerializer,
+        responses={
+            200: ProductEditSerializer,
+            400: OpenApiExample(
+                'Bad Request',
+                value={'detail': 'No data provided.'}
+            ),
+            403: OpenApiExample(
+                'Forbidden',
+                value={'detail': "You can't edit this product unless you're an author or an admin."}
+            ),
+            404: OpenApiExample(
+                'Not Found',
+                value={'error': 'Product not found'}
+            )
+        },
+        tags=['Products']
+    )
+
 
     def update(self, request, *args, **kwargs):
         product_id = kwargs['id']

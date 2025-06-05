@@ -32,6 +32,9 @@ REST_FRAMEWORK = {
     ],
 
     'EXCEPTION_HANDLER': 'utils.exception_handler.custom_exception_handler',
+
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
 }
 
 SIMPLE_JWT = {
@@ -70,6 +73,7 @@ INSTALLED_APPS = [
     "users",
     "products",
     "meals",
+    'drf_spectacular',
 ]
 
 AUTH_USER_MODEL = 'users.MyUser'
@@ -168,3 +172,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'FitApp API',
+    'DESCRIPTION': 'API for managing users, products, and meals',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
+}
