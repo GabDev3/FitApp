@@ -1,4 +1,4 @@
-# from django.contrib.auth import get_user_model, authenticate, login
+
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserGetSerializer, UserEditSerializer, UserEditRoleSerializer
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response

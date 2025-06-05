@@ -2,7 +2,7 @@ from .serializers import (ProductCreateSerializer, ProductGetSerializer,
                           ProductRemoveSerializer, ProductEditSerializer)
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
-# from .models import Product
+
 from .services import ProductService
 from users.services import UserService
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -219,7 +219,7 @@ class ProductEditView(generics.RetrieveUpdateAPIView):
         result = ProductService.update_product(product_id, user, data)
 
         if isinstance(result, Response):
-            return result  # already a Response object with error
+            return result  
 
         serializer = self.get_serializer(result)
         return Response(serializer.data, status=status.HTTP_200_OK)

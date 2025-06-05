@@ -22,7 +22,7 @@ class MealCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         meal_products_data = validated_data.pop('meal_products')
-        # Add author if passed via context (used below)
+        
         author = self.context['request'].user
         meal = Meal.objects.create(author_meal=author, **validated_data)
         for mp_data in meal_products_data:

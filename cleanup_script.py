@@ -29,5 +29,4 @@ def process_directory(directory):
                 remove_comments_and_logs(file_path)
 
 # Run cleanup for both frontend and backend directories
-process_directory('frontend')
 process_directory('backend')

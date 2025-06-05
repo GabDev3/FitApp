@@ -234,7 +234,7 @@ class AddConsumedMealView(generics.GenericAPIView):
     )
 
     def post(self, request, *args, **kwargs):
-        meal_id = self.kwargs.get(self.lookup_url_kwarg)  # Retrieve meal_id from URL
+        meal_id = self.kwargs.get(self.lookup_url_kwarg)  
         try:
             result = MealService.add_consumed_meal(meal_id, request.user.id)
             return Response(result, status=status.HTTP_201_CREATED)
@@ -278,7 +278,7 @@ class RemoveConsumedMealView(generics.GenericAPIView):
     )
 
     def delete(self, request, *args, **kwargs):
-        user_meal_id = self.kwargs.get(self.lookup_url_kwarg)  # Retrieve user_meal_id from URL
+        user_meal_id = self.kwargs.get(self.lookup_url_kwarg)  
         try:
             MealService.remove_consumed_meal(user_meal_id, request.user.id)
             return Response(status=status.HTTP_204_NO_CONTENT)
