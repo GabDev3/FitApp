@@ -44,7 +44,7 @@ class ProductEditSerializer(serializers.ModelSerializer):
         read_only_fields = ['carbohydrates', 'fats']
 
     def validate_name(self, value):
-        # This prevents false-positive uniqueness errors when name didn't change
+        
         if self.instance and Product.objects.exclude(id=self.instance.id).filter(name=value).exists():
             raise serializers.ValidationError("Product with this name already exists.")
         return value

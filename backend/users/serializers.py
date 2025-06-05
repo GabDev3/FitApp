@@ -15,7 +15,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = MyUser
         fields = ['id', 'email', 'password', 'first_name', 'last_name', 'height',
                   'weight', 'activity_level', 'goal', 'dailyIntake', 'age']
-        extra_kwargs = {'password': {'write_only': True}}  # Don't expose password
+        extra_kwargs = {'password': {'write_only': True}}  
 
 
 class UserEditSerializer(serializers.ModelSerializer):

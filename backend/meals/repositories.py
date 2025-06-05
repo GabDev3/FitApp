@@ -35,25 +35,25 @@ class MealRepository:
         if not meal:
             raise ValueError("Meal object is None")
 
-        print(f"Updating meal {meal.id} with products: {meal_products}")  # Debug log
+        print(f"Updating meal {meal.id} with products: {meal_products}")  
 
         try:
             with transaction.atomic():
-                # Get existing products for comparison
+                
                 existing_products = set(meal.meal_products.values_list('product_id', flat=True))
-                print(f"Existing products: {existing_products}")  # Debug log
+                print(f"Existing products: {existing_products}")  
 
-                # Delete existing MealProducts
+                
                 deleted_count = meal.meal_products.all().delete()
-                print(f"Deleted {deleted_count} existing meal products")  # Debug log
+                print(f"Deleted {deleted_count} existing meal products")  
 
-                # Create new MealProducts
+                
                 new_products = []
                 for item in meal_products:
                     product_id = item.get('product_id')
                     quantity = item.get('quantity')
 
-                    print(f"Processing product_id: {product_id}, quantity: {quantity}")  # Debug log
+                    print(f"Processing product_id: {product_id}, quantity: {quantity}")  
 
                     if not product_id or not quantity:
                         raise ValueError(f"Invalid product data: {item}")
@@ -68,11 +68,11 @@ class MealRepository:
                     )
                     new_products.append(new_product)
 
-                print(f"Created {len(new_products)} new meal products")  # Debug log
+                print(f"Created {len(new_products)} new meal products")  
 
         except Exception as e:
-            print(f"Error in repository update_meal: {str(e)}")  # Debug log
-            print(f"Error type: {type(e)}")  # Debug log
+            print(f"Error in repository update_meal: {str(e)}")  
+            print(f"Error type: {type(e)}")  
             raise
 
         return True

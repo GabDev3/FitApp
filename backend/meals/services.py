@@ -27,11 +27,11 @@ class MealService:
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        # Update meal name
+        
         meal.name = validated_data['name']
         meal.save()
 
-        # Update meal products
+        
         meal_products = [
             {
                 "product_id": mp['product_id'],
@@ -43,7 +43,7 @@ class MealService:
         try:
             MealRepository.update_meal(meal=meal, meal_products=meal_products)
         except Exception as e:
-            print(f"Error in update_meal: {e}")  # Debug log
+            print(f"Error in update_meal: {e}")  
             raise
 
         return meal
@@ -78,7 +78,7 @@ class MealService:
     def get_meal_by_id(id: int):
         return MealRepository.get_meal_by_id(id)
 
-    # services.py modification
+    
     @staticmethod
     def add_consumed_meal(meal_id: int, user_id: int):
         """

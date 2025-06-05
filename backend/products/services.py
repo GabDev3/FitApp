@@ -33,16 +33,16 @@ class ProductService:
         product = ProductRepository.get_by_id(product_id)
         author = product.author_product
 
-        # Authorization
+        
         if author.id != user.id and not UserService.user_is_admin(user.id):
             return Response({"detail": "You can't edit this product unless you're an author or an admin."},
                             status=status.HTTP_403_FORBIDDEN)
 
-        # Serializer validation
+        
         serializer = ProductEditSerializer(instance=product, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        # Validated data passed to repo
+        
         return ProductRepository.update(product, serializer.validated_data)
 
     @staticmethod
